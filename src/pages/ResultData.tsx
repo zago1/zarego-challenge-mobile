@@ -1,12 +1,10 @@
-import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, SafeAreaView } from "react-native";
 
-export function ResultData() {
-
+export const ResultData = () => {
   return (
     <SafeAreaView>
       <View>
-        <Text>ResultData</Text>
+        <Text>ResultData 123</Text>
       </View>
     </SafeAreaView>
   )
