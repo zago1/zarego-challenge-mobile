@@ -9,7 +9,7 @@ import { PageHeader } from "../components/PageHeader";
 import { Page } from "../components/Page";
 import { Footer } from "../components/Footer";
 
-import { formatCountriesToTableData } from "../utils";
+import { formatCountriesToTableData, generatePDFByCountriesData, shareFile } from "../utils";
 
 const ResultData = () => {
   const { selectedCountries } = useContext(CountriesContext)
@@ -19,7 +19,10 @@ const ResultData = () => {
     [selectedCountries]
   );
 
-  const handlePress = () => {}
+  const handlePress = async () => {
+    const file = await generatePDFByCountriesData(selectedCountries);
+    await shareFile(file.uri);
+  }
 
   return (
     <Screen>
