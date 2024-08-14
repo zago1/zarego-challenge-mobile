@@ -2,9 +2,8 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackNavigationOptions } from "@react-navigation/native-stack";
 
-import { ChooseCountry } from "./pages/ChooseCountry";
-import { ResultData } from "./pages/ResultData";
-import { View } from "react-native";
+import { ChooseCountry } from "./screens/ChooseCountry";
+import { ResultData } from "./screens/ResultData";
 
 const Stack = createNativeStackNavigator();
 
