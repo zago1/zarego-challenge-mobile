@@ -1,16 +1,17 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 
 type Props = {
   text: string;
   disabled?: boolean;
+  style?: ViewStyle;
   onPress(): void;
 }
 
-const Button = ({ text, onPress, disabled }: Props) => {
+const Button = ({ text, style, onPress, disabled }: Props) => {
   return (
     <TouchableOpacity 
-      style={[styles.button, disabled && styles.disabledButton]}
+      style={[styles.button, style, disabled && styles.disabledButton]}
       disabled={disabled}
       onPress={onPress}>
       <Text style={[styles.buttonText, disabled && styles.disabledText]}>{text}</Text>
@@ -25,6 +26,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#fff',
+    borderRadius: 4,
     paddingVertical: 16
   },
   disabledButton: {
