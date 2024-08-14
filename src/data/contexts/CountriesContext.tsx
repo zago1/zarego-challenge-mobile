@@ -7,8 +7,11 @@ interface CountryContextProps {
   countries: Country[];
   selectedCountries: Country[];
   totalPages: number;
+  loading: boolean;
+  error: boolean;
   selectCountry(id: number): void
-  loadMore(page: number, pageSize: number): void
+  loadMore(): void
+  loadCountries(): void
 }
 
 const PAGE_SIZE = 20;
@@ -17,7 +20,10 @@ export const CountriesContext = createContext({} as CountryContextProps);
 
 export function CountryProvider({ children }: { children: React.ReactNode }) {
   const [countries, setCountries] = useState<Country[]>([]);
-  const [totalRegisters, setTotalRegisters] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const { httpGet } = useAPI();
 
@@ -33,25 +39,45 @@ export function CountryProvider({ children }: { children: React.ReactNode }) {
 
   const loadCountries = useCallback(async function(page: number = 1) {
     try {
-      const data = await httpGet('/');
-      setCountries(data.data);
-      setTotalRegisters(data.metadata.total_registers);
+      if (loading) { return; }
+      setError(false);
+      setLoading(true);
+      const { data, ok } = await httpGet(`/?page=${page}&pageSize=${PAGE_SIZE}`);
+
+      if (!ok) { 
+        setError(true);
+        setLoading(false);
+        return;
+      }
+
+      if (totalPages === 0) {
+        setTotalPages(Math.ceil(data.metadata.total_registers / PAGE_SIZE));
+      }
+
+      setCountries(currentCountries => [...currentCountries, ...data.data]);
     } catch (err) {
       console.log('[err]', err);
+      setError(error);
+    } finally {
+      setLoading(false);
     }
-  }, [httpGet]); 
+  }, [httpGet, totalPages, loading]); 
+
+  const loadMore = useCallback(async function() {
+    const nextPage = currentPage + 1;
+    if (nextPage > totalPages) { return; }
+
+    await loadCountries(nextPage);
+    setCurrentPage(nextPage);
+  }, [currentPage, loadCountries, totalPages])
 
   const selectedCountries = useMemo(() => {
     return countries.filter((country) => country.selected)
   }, [countries]);
 
-  const totalPages = useMemo(() => {
-    return Math.ceil(totalRegisters / PAGE_SIZE);
-  }, [totalRegisters]);
-
   useEffect(() => {
     loadCountries();
-  }, [loadCountries]);
+  }, []);
 
   return (
     <CountriesContext.Provider
@@ -59,8 +85,11 @@ export function CountryProvider({ children }: { children: React.ReactNode }) {
         countries,
         selectedCountries,
         totalPages,
+        loading,
+        error,
         selectCountry,
-        loadMore: loadCountries,
+        loadMore,
+        loadCountries
       }}
     >
       {children}
